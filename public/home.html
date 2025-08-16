@@ -130,6 +130,57 @@
       border-top: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
     }
     footer a { color: var(--accent); margin: 0 0.5rem; }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: var(--surface);
+      padding: 2rem;
+      border-radius: var(--r);
+      width: 90%;
+      max-width: 500px;
+    }
+    .close {
+      float: right;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: var(--r);
+      border: 1px solid var(--muted);
+      background: var(--elev);
+      color: var(--text);
+    }
+    textarea.form-control {
+      min-height: 100px;
+    }
+    select.form-control[multiple] {
+      height: 120px;
+    }
+    .mt-2 {
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -137,21 +188,19 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <h1>ProMan</h1>
-    <a href="home.html">Dashboard</a>
+    <a href="home.html">Home</a>
     <a href="projects.html">Projects</a>
     <a href="#">Teams</a>
     <a href="#">Calendar</a>
     <a href="#">Reports</a>
     <a href="settings.html">Settings</a>
-    <a href="index.html" class="btn btn-contrast btn-logout">Logout</a>
   </aside>
 
   <!-- Main Content -->
   <div class="main">
     <!-- Header -->
     <div class="main-header">
-      <h2>Welcome Back, User!</h2>
-      <button class="btn btn-primary">+ New Project</button>
+      <h2 id="welcome-message">Welcome Back, User!</h2>
     </div>
 
     <!-- Kanban Board -->
@@ -214,18 +263,5 @@
       </p>
     </footer>
   </div>
-
-
-
-  <script type="module">
-  import { protectPage, getUserName } from "./js/firebase/authGuard.js";
-
-  // Protect the page automatically
-  protectPage();
-
-  // Fill username in page
-  getUserName("username");
-</script>
-
 </body>
 </html>
