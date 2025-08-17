@@ -36,6 +36,13 @@ body, html { margin:0; font-family: system-ui, sans-serif; height: 100%; display
 .mt-2{ margin-top:0.5rem; }
 </style>
 </head>
+
+<script>
+  // Apply saved theme (default = dark)
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+</script>
+
 <body>
 
 <aside class="sidebar">
