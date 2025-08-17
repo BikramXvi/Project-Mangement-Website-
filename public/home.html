@@ -262,6 +262,11 @@
         <a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Contact</a>
       </p>
     </footer>
+    <script type="module">  
+      import { auth } from "./js/firebase/config.js";
+      import { protectPage } from "./js/firebase/authGuard.js";
+      protectPage();
+    </script>
   </div>
 </body>
 </html>

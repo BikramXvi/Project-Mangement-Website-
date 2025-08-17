@@ -112,7 +112,7 @@ window.addEventListener("click", e => { if (e.target === taskModal) taskModal.st
 
 // Unified submit handler for add/edit
 taskForm.addEventListener("submit", async e => {
-  e.preventDefault();
+  e.preventDefault(); 
   const title = document.getElementById("taskTitle").value;
   const description = document.getElementById("taskDescription").value;
   const status = document.getElementById("taskStatus").value;
@@ -207,6 +207,6 @@ onTasksChange(selectedProjectId, tasks => {
   });
 });
 </script>
-
+  
 </body>
 </html>
