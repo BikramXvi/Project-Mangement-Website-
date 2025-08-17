@@ -44,6 +44,13 @@
     .mt-2 { margin-top: 1rem; }
   </style>
 </head>
+
+<script>
+  // Apply saved theme (default = dark)
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+</script>
+
 <body>
 
 <aside class="sidebar">
