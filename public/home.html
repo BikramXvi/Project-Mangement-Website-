@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planhubb - Dashboard</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    body, html {
+      height: 100%;
+      display: flex;
+      margin: 0;
+      font-family: system-ui, sans-serif;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: var(--surface);
+      border-right: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 1rem;
+      gap: 1.5rem;
+    }
+    .sidebar h1 {
+      color: var(--accent);
+      margin: 0 0 2rem 0;
+    }
+    .sidebar a {
+      padding: 0.6rem 1rem;
+      border-radius: var(--r);
+      display: block;
+      color: var(--text);
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .sidebar a:hover {
+      background: var(--elev);
+      color: var(--accent);
+    }
+    .sidebar .btn-logout {
+      margin-top: auto;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 2rem;
+      gap: 2rem;
+      background: var(--bg);
+    }
+
+    /* Header */
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .main-header h2 {
+      color: var(--accent);
+      margin: 0;
+    }
+
+    /* Kanban Board */
+    .kanban {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+    .kanban-column {
+      flex: 1;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      height: 400px;
+      overflow-y: auto;
+    }
+    .kanban-column h3 {
+      margin-bottom: 1rem;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+    .kanban-task {
+      background: var(--elev);
+      padding: 0.7rem;
+      margin-bottom: 0.75rem;
+      border-radius: var(--r);
+      cursor: grab;
+      border: 1px solid transparent;
+      transition: transform 0.1s ease, background 0.2s ease;
+    }
+    .kanban-task:hover {
+      transform: scale(1.02);
+      background: color-mix(in oklab, var(--accent) 15%, var(--elev));
+    }
+
+    /* Quick Actions Grid */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      padding: 1rem;
+      border-radius: var(--r);
+      background: var(--elev);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .card:hover { transform: translateY(-3px); }
+    .card h4 { color: var(--accent); margin-bottom: 0.5rem; }
+
+    /* Footer */
+    footer {
+      background: var(--surface);
+      padding: 1rem;
+      text-align: center;
+      color: var(--muted);
+      margin-top: 2rem;
+      border-top: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
+    }
+    footer a { color: var(--accent); margin: 0 0.5rem; }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: var(--surface);
+      padding: 2rem;
+      border-radius: var(--r);
+      width: 90%;
+      max-width: 500px;
+    }
+    .close {
+      float: right;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: var(--r);
+      border: 1px solid var(--muted);
+      background: var(--elev);
+      color: var(--text);
+    }
+    textarea.form-control {
+      min-height: 100px;
+    }
+    select.form-control[multiple] {
+      height: 120px;
+    }
+    .mt-2 {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+
+<script>
+  // Apply saved theme (default = dark)
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+</script>
+
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h1>ProMan</h1>
+    <a href="home.html">Home</a>
+    <a href="projects.html">Projects</a>
+    <a href="#">Teams</a>
+    <a href="#">Calendar</a>
+    <a href="#">Reports</a>
+    <a href="settings.html">Settings</a>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Header -->
+    <div class="main-header">
+      <h2 id="welcome-message">Welcome Back, User!</h2>
+    </div>
+
+    <!-- Kanban Board -->
+    <section>
+      <h2 style="color: var(--accent); margin-bottom:1rem;">Kanban Board</h2>
+      <div class="kanban">
+        <div class="kanban-column">
+          <h3>Planning</h3>
+          <div class="kanban-task">Define project scope</div>
+          <div class="kanban-task">Gather requirements</div>
+        </div>
+        <div class="kanban-column">
+          <h3>To Do</h3>
+          <div class="kanban-task">Design UI mockups</div>
+          <div class="kanban-task">Setup project repo</div>
+        </div>
+        <div class="kanban-column">
+          <h3>In Progress</h3>
+          <div class="kanban-task">Develop login page</div>
+        </div>
+        <div class="kanban-column">
+          <h3>Review</h3>
+          <div class="kanban-task">QA testing</div>
+        </div>
+        <div class="kanban-column">
+          <h3>Done</h3>
+          <div class="kanban-task">Project setup completed</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section>
+      <h2 style="color: var(--accent); margin-bottom:1rem;">Quick Actions</h2>
+      <div class="quick-actions">
+        <div class="card">
+          <h4>Create Task</h4>
+          <p>Add a new task to any project or Kanban column.</p>
+        </div>
+        <div class="card">
+          <h4>View Reports</h4>
+          <p>See project progress, team stats, and deadlines.</p>
+        </div>
+        <div class="card">
+          <h4>Team Chat</h4>
+          <p>Collaborate with team members in real-time.</p>
+        </div>
+        <div class="card">
+          <h4>Calendar</h4>
+          <p>Track deadlines and upcoming events easily.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 Planhubb. All rights reserved.</p>
+      <p>
+        <a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Contact</a>
+      </p>
+    </footer>
+    <script type="module">  
+      import { auth } from "./js/firebase/config.js";
+      import { protectPage } from "./js/firebase/authGuard.js";
+      protectPage();
+    </script>
+  </div>
+</body>
+</html>

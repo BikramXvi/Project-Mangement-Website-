@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planhubb - Kanban</title>
+<link rel="stylesheet" href="css/main.css">
+<style>
+body, html { margin:0; font-family: system-ui, sans-serif; height: 100%; display: flex; }
+.sidebar { width: 250px; background: var(--surface); border-right:1px solid color-mix(in oklab,var(--muted) 35%,transparent); display: flex; flex-direction: column; padding: 2rem 1rem; gap:1.5rem; }
+.sidebar h1{ color: var(--accent); margin-bottom:2rem; }
+.sidebar a{ color: var(--text); text-decoration:none; display:block; padding:0.5rem; border-radius:var(--r); }
+.sidebar a:hover{ background: var(--elev); color: var(--accent); }
+
+.main { flex:1; display:flex; flex-direction:column; padding:2rem; gap:2rem; background:var(--bg); overflow-y:auto; }
+.kanban-header { display:flex; justify-content: space-between; align-items:center; }
+.kanban-header h2 { color: var(--accent); }
+
+.kanban-columns { display:flex; gap:1rem; overflow-x:auto; }
+.kanban-column { background: var(--surface); flex:1; min-width:250px; border-radius:var(--r); padding:1rem; display:flex; flex-direction:column; }
+.kanban-column h3 { margin-top:0; color: var(--accent); }
+
+.task-card { background: var(--elev); padding:0.5rem; border-radius: var(--r); margin-bottom:0.5rem; cursor: grab; }
+
+.task-actions { display:flex; gap:0.3rem; margin-top:0.5rem; }
+
+.modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:1000; }
+.modal-content { background:var(--surface); padding:1.5rem; border-radius:var(--r); width:90%; max-width:400px; }
+.close { float:right; cursor:pointer; font-size:1.5rem; }
+.form-group { margin-bottom:1rem; }
+.form-group label { display:block; margin-bottom:0.3rem; }
+.form-control { width:100%; padding:0.4rem; border-radius:var(--r); border:1px solid var(--muted); background:var(--bg); color:var(--text); }
+.btn { padding:0.4rem 0.7rem; border:none; border-radius:var(--r); cursor:pointer; }
+.btn-primary { background: #3b82f6; color:#fff; }
+.btn-danger { background:#ef4444; color:#fff; }
+.mt-2{ margin-top:0.5rem; }
+</style>
+</head>
+
+<script>
+  // Apply saved theme (default = dark)
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+</script>
+
+<body>
+
+<aside class="sidebar">
+  <h1>ProMan</h1>
+  <a href="projects.html">Back to Projects</a>
+</aside>
+
+<div class="main">
+  <div class="kanban-header">
+    <h2 id="projectTitle">Project Kanban</h2>
+    <button id="newTaskBtn" class="btn btn-primary">+ New Task</button>
+  </div>
+
+  <div class="kanban-columns">
+    <div class="kanban-column" data-status="todo"><h3>To Do</h3></div>
+    <div class="kanban-column" data-status="inProgress"><h3>In Progress</h3></div>
+    <div class="kanban-column" data-status="review"><h3>Review</h3></div>
+    <div class="kanban-column" data-status="done"><h3>Done</h3></div>
+  </div>
+
+  <!-- Task Modal -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span id="closeTaskModal" class="close">&times;</span>
+      <h2 id="modalTitle">Add Task</h2>
+      <form id="taskForm">
+        <div class="form-group">
+          <label for="taskTitle">Title</label>
+          <input type="text" id="taskTitle" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="taskDescription">Description</label>
+          <textarea id="taskDescription" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="taskAssigned">Assigned To (comma emails/UIDs)</label>
+          <input type="text" id="taskAssigned" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="taskStatus">Status</label>
+          <select id="taskStatus" class="form-control">
+            <option value="todo">To Do</option>
+            <option value="inProgress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Save Task</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { addTask, onTasksChange, updateTask, deleteTask } from "./js/firebase/firestore.js";
+
+const newTaskBtn = document.getElementById("newTaskBtn");
+const taskForm = document.getElementById("taskForm");
+const taskModal = document.getElementById("taskModal");
+const closeTaskModal = document.getElementById("closeTaskModal");
+const selectedProjectId = localStorage.getItem("selectedProjectId");
+
+const columns = {
+  todo: document.querySelector('.kanban-column[data-status="todo"]'),
+  inProgress: document.querySelector('.kanban-column[data-status="inProgress"]'),
+  review: document.querySelector('.kanban-column[data-status="review"]'),
+  done: document.querySelector('.kanban-column[data-status="done"]'),
+};
+
+// Open/close modal
+newTaskBtn.addEventListener("click", () => taskModal.style.display = "flex");
+closeTaskModal.addEventListener("click", () => taskModal.style.display = "none");
+window.addEventListener("click", e => { if (e.target === taskModal) taskModal.style.display = "none"; });
+
+// Unified submit handler for add/edit
+taskForm.addEventListener("submit", async e => {
+  e.preventDefault(); 
+  const title = document.getElementById("taskTitle").value;
+  const description = document.getElementById("taskDescription").value;
+  const status = document.getElementById("taskStatus").value;
+  const assigned = document.getElementById("taskAssigned").value.split(",").map(u => u.trim()).filter(Boolean);
+  const editId = taskForm.dataset.editId;
+
+  if (editId) {
+    await updateTask(selectedProjectId, editId, { title, description, status, assigned });
+    delete taskForm.dataset.editId;
+  } else {
+    await addTask(selectedProjectId, { title, description, status, assigned });
+  }
+
+  taskModal.style.display = "none";
+  taskForm.reset();
+});
+
+// Make tasks draggable
+function makeDraggable(taskDiv, task) {
+  taskDiv.draggable = true;
+
+  taskDiv.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", task.id);
+    e.dataTransfer.effectAllowed = "move";
+    taskDiv.classList.add("dragging");
+  });
+
+  taskDiv.addEventListener("dragend", () => {
+    taskDiv.classList.remove("dragging");
+  });
+}
+
+// Set columns as drop zones
+Object.values(columns).forEach(col => {
+  col.addEventListener("dragover", e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    col.classList.add("drag-over");
+  });
+
+  col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
+
+  col.addEventListener("drop", async e => {
+    e.preventDefault();
+    col.classList.remove("drag-over");
+    const taskId = e.dataTransfer.getData("text/plain");
+    const newStatus = col.dataset.status;
+    await updateTask(selectedProjectId, taskId, { status: newStatus });
+  });
+});
+
+// Render tasks in real-time
+onTasksChange(selectedProjectId, tasks => {
+  Object.values(columns).forEach(col => col.innerHTML = `<h3>${col.querySelector('h3').textContent}</h3>`);
+
+  tasks.forEach(task => {
+    const div = document.createElement("div");
+    div.className = "task-card";
+    div.innerHTML = `
+      <h4>${task.title}</h4>
+      <p>${task.description || ''}</p>
+      <div class="task-actions">
+        <button class="btn btn-primary btn-edit">Edit</button>
+        <button class="btn btn-danger btn-delete">Delete</button>
+      </div>
+    `;
+
+    // Drag functionality
+    makeDraggable(div, task);
+
+    // Delete
+    div.querySelector(".btn-delete").addEventListener("click", async e => {
+      e.stopPropagation();
+      if (confirm("Delete this task?")) {
+        await deleteTask(selectedProjectId, task.id);
+      }
+    });
+
+    // Edit
+    div.querySelector(".btn-edit").addEventListener("click", e => {
+      e.stopPropagation();
+      taskModal.style.display = "flex";
+      document.getElementById("taskTitle").value = task.title;
+      document.getElementById("taskDescription").value = task.description || "";
+      document.getElementById("taskStatus").value = task.status || "todo";
+      document.getElementById("taskAssigned").value = (task.assigned || []).join(", ");
+      taskForm.dataset.editId = task.id;
+    });
+
+    const col = columns[task.status] || columns.todo;
+    col.appendChild(div);
+  });
+});
+</script>
+  
+</body>
+</html>

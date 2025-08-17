@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProMan - Login</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    main {
+      max-width: 380px;
+      margin: 4rem auto;
+      padding: 2rem;
+      border-radius: var(--r);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: var(--accent);
+    }
+    .btn img {
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<main>
+  <h1>ProMan Signup</h1>
+
+  <!-- Google Login -->
+  <button id="google-btn" class="btn btn-outline" style="width:100%; margin-bottom:.5rem;">
+    <img src="../img/google.png" alt="Google" style="width:18px; height:18px;">
+    Continue with Google
+  </button>
+
+  <!-- GitHub Login -->
+  <button id="github-btn" class="btn btn-contrast" style="width:100%;">
+    <img src="../img/github-mark-white.svg" alt="GitHub" style="width:18px; height:18px;">
+    Continue with GitHub
+  </button>
+
+  <p class="text-muted" style="text-align:center; margin-top:1rem; font-size:.85rem;">
+    Already have an account? <a href="login.html">Login</a>
+  </p>
+</main>
+
+<!-- Import Firebase auth functions -->
+<script type="module">
+  import { googleLogin, githubLogin } from "../js/firebase/auth.js";
+
+  document.getElementById("google-btn").addEventListener("click", googleLogin);
+  document.getElementById("github-btn").addEventListener("click", githubLogin);
+</script>
+
+</body>
+</html>
+

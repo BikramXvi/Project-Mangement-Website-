@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Planhubb - Settings</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    /* Sidebar layout */
+    body {
+      display: flex;
+      height: 100vh;
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      gap: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar h2 {
+      margin-bottom: 1rem;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+
+    .sidebar button, .sidebar a {
+      width: 100%;
+      text-align: left;
+      padding: .6rem .8rem;
+      border-radius: var(--r);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      background: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background .2s ease;
+    }
+
+    .sidebar button:hover, .sidebar a:hover {
+      background: var(--elev);
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      background: var(--bg);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+
+    .settings-section {
+      margin-top: 2rem;
+      background: var(--surface);
+      padding: 1.5rem;
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+    }
+
+    .settings-section h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .settings-section label {
+      display: block;
+      margin-bottom: .5rem;
+      color: var(--muted);
+    }
+
+    .settings-section input {
+      width: 100%;
+      padding: .5rem .75rem;
+      margin-bottom: 1rem;
+      border-radius: var(--r);
+      border: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
+      background: var(--elev);
+      color: var(--text);
+    }
+
+    .btn-logout {
+      margin-top: auto;
+      background: var(--err);
+      color: #fff;
+    }
+  </style>
+</head>
+
+<script>
+  // Apply saved theme (default = dark)
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+</script>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>ProMan</h2>
+    <a href="home.html">Back <-</a>
+    <button id="logout-btn" class="btn btn-outline">Logout</button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <h1>Settings</h1>
+
+    <div class="settings-section">
+      <h3>Profile</h3>
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Your name" readonly>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Your email" readonly>
+    </div>
+
+    <div class="settings-section">
+      <h3>Preferences</h3>
+      <label for="theme">Theme</label>
+      <select id="theme" class="select">
+        <option value="dark" selected>Dark</option>
+        <option value="light">Light</option>
+      </select>
+    </div>
+  </main>
+
+
+<script type="module">
+  import { protectPage } from "./js/firebase/authGuard.js";
+  import { logout } from "./js/firebase/authUtils.js";
+
+  // Protect page
+  protectPage(); 
+
+  // Attach logout button
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    logout(); // redirect happens automatically
+  });
+  // Get the select element
+  const themeSelect = document.getElementById("theme");
+
+  // Load saved theme from localStorage
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeSelect.value = savedTheme;
+
+  // Listen for changes
+  themeSelect.addEventListener("change", function() {
+    const selectedTheme = this.value;
+    // Set the HTML data-theme attribute
+    document.documentElement.setAttribute("data-theme", selectedTheme);
+    // Save preference
+    localStorage.setItem("theme", selectedTheme);
+  });
+</script>
+</body>
+</html>

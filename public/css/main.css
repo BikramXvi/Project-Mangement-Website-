@@ -1,0 +1,361 @@
+/* =========
+   Dark Mode Base + Accents
+   - Primary accent: teal
+   - Optional contrast accent: amber
+   - Works with system dark mode AND manual [data-theme="dark"]
+   ========= */
+/* =========================
+   Modern Light Theme
+   ========================= */
+html[data-theme="light"] {
+  /* Backgrounds */
+  --bg: #fafafa;          /* page background */
+  --surface: #e4e5f1;     /* cards, nav, modals */
+  --elev: #d2d3db;        /* hover / elevated elements */
+
+  /* Text */
+  --text: #484b6a;        /* primary text */
+  --muted: #9394a5;       /* secondary text, subtle gray */
+
+  /* Accents */
+  --accent: #5c6bc0;      /* soft muted blue for buttons, highlights */
+  --accent-contrast: #1d4ed8; /* optional stronger blue */
+
+  /* Status colors */
+  --ok: #22c55e;          /* success green */
+  --warn: #f59e0b;        /* warning amber */
+  --err: #ef4444;         /* error red */
+
+  /* Radii & shadows */
+  --r: 12px;
+  --shadow: 0 4px 16px rgba(0,0,0,0.08); /* modern soft shadow */
+}
+
+/* Surfaces */
+.card,
+.nav,
+.footer,
+.input,
+.select,
+.textarea {
+  background: var(--surface);
+  border: 1px solid rgba(154, 155, 174, 0.35); /* subtle border */
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+}
+
+/* Hover / Elevation */
+.card:hover,
+.nav:hover {
+  background: var(--elev);
+}
+
+/* Text & Links */
+body, html {
+  background: var(--bg);
+  color: var(--text);
+}
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* ====== Buttons (Light Mode) ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem .95rem;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+/* Primary button: blue background, white text */
+.btn-primary {
+  background: var(--accent);  /* e.g., #5c6bc0 */
+  color: #ffffff;              /* white text for contrast */
+  border-color: transparent;
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+/* Outline button: transparent background, dark text */
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(147,148,165,0.6);
+}
+.btn-outline:hover {
+  background: var(--elev);
+  border-color: var(--accent);
+}
+
+/* Optional contrast button: lighter background, dark text */
+.btn-contrast {
+  background: var(--accent-contrast); /* e.g., #1d4ed8 */
+  color: #ffffff;                      /* white text for contrast */
+  border-color: transparent;
+}
+.btn-contrast:hover {
+  filter: brightness(1.05);
+}
+
+/* Inputs */
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: .65rem .8rem;
+  color: var(--text);
+  outline: none;
+  background: var(--surface);
+  border: 1px solid rgba(147,148,165,0.35);
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--muted);
+}
+
+/* Focus ring */
+:where(.input, .select, .textarea, .btn):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(147,148,165,0.4) transparent;
+}
+*::-webkit-scrollbar { height: 10px; width: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(147,148,165,0.4);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Badges / Chips */
+.badge {
+  display: inline-block;
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  font-size: .8rem;
+  border: 1px solid rgba(92,107,192,0.55);
+  background: rgba(92,107,192,0.18);
+  color: var(--text);
+}
+
+:root { 
+  /* neutrals */
+  --bg: #0b0f13;        /* page background */
+  --surface: #12171d;   /* cards/nav */
+  --elev: #1a2129;      /* hovered/raised */
+  --text: #e6edf3;      /* primary text */
+  --muted: #9aa9b8;     /* secondary text/borders */
+
+  /* accents (pick 1–2) */
+  --accent: #2dd4bf;    /* teal */
+  --accent-contrast: #f59e0b; /* amber (optional) */
+
+  /* states */
+  --ok: #22c55e;
+  --warn: var(--accent-contrast);
+  --err: #ef4444;
+
+  /* radii & shadows */
+  --r: 14px;
+  --shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+
+/* Prefer dark by default; respect system setting */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+/* Manual toggle support: <html data-theme="dark"> */
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ====== Global ====== */
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--muted), transparent);
+  margin: 1.25rem 0;
+}
+
+/* ====== Surfaces ====== */
+.card,
+.nav,
+.footer,
+.input,
+.select,
+.textarea {
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+}
+
+.card { padding: 1rem; }
+.nav { padding: .75rem 1rem; }
+.footer { padding: 1rem; opacity: .95; }
+
+/* Hover elevation */
+.card:hover,
+.nav:hover {
+  background: var(--elev);
+}
+
+/* ====== Buttons ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .6rem .95rem;
+  border-radius: calc(var(--r) - 6px);
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .08s ease, filter .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.btn:active { transform: translateY(1px) scale(.99); }
+
+/* Primary (teal) */
+.btn-primary {
+  background: color-mix(in oklab, var(--accent) 86%, black);
+  color: #0a0f0f;
+  border-color: color-mix(in oklab, var(--accent) 60%, black);
+}
+.btn-primary:hover {
+  filter: brightness(1.06);
+}
+
+/* Secondary outline (uses text & muted) */
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border-color: color-mix(in oklab, var(--muted) 60%, transparent);
+}
+.btn-outline:hover {
+  background: var(--elev);
+  border-color: var(--accent);
+}
+
+/* Optional contrast button (amber) */
+.btn-contrast {
+  background: color-mix(in oklab, var(--accent-contrast) 86%, black);
+  color: #1a1305;
+  border-color: color-mix(in oklab, var(--accent-contrast) 60%, black);
+}
+.btn-contrast:hover { filter: brightness(1.06); }
+
+/* ====== Inputs ====== */
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: .65rem .8rem;
+  color: var(--text);
+  outline: none;
+}
+.input::placeholder,
+.textarea::placeholder { color: var(--muted); }
+
+/* Focus ring using accent */
+:where(.input, .select, .textarea, .btn):focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent) 80%, white);
+  outline-offset: 2px;
+}
+
+/* ====== Badges / Chips ====== */
+.badge {
+  display: inline-block;
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  font-size: .8rem;
+  border: 1px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  background: color-mix(in oklab, var(--accent) 18%, var(--surface));
+  color: var(--text);
+}
+
+/* ====== Tables ====== */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.table th,
+.table td {
+  padding: .75rem .9rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
+}
+.table thead th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 600;
+}
+.table tbody tr:hover {
+  background: var(--elev);
+}
+
+/* ====== Code blocks ====== */
+pre, code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+pre {
+  background: #0a0e12;
+  border: 1px solid #1e2937;
+  border-radius: var(--r);
+  padding: .9rem 1rem;
+  overflow: auto;
+}
+
+/* ====== Scrollbar (modern browsers) ====== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+*::-webkit-scrollbar { height: 10px; width: 10px; }
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--muted) 80%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ====== Utility helpers ====== */
+.text-muted { color: var(--muted); }
+.accent { color: var(--accent); }
+.accent-contrast { color: var(--accent-contrast); } /* optional */
+.surface { background: var(--surface); border-radius: var(--r); }
+.elev { background: var(--elev); border-radius: var(--r); }

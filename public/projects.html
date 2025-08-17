@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planhubb - Projects</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    body, html { height: 100%; display: flex; margin: 0; font-family: system-ui, sans-serif; }
+    .sidebar {
+      width: 250px; background: var(--surface); border-right: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
+      display: flex; flex-direction: column; padding: 2rem 1rem; gap: 1.5rem;
+    }
+    .sidebar h1 { color: var(--accent); margin-bottom: 2rem; }
+    .sidebar a { padding: 0.6rem 1rem; border-radius: var(--r); display: block; color: var(--text); text-decoration: none; transition: background 0.2s ease; }
+    .sidebar a:hover { background: var(--elev); color: var(--accent); }
+    .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 2rem; gap: 2rem; background: var(--bg); }
+    .main-header { display: flex; justify-content: space-between; align-items: center; }
+    .main-header h2 { color: var(--accent); margin: 0; }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 2rem; }
+    .project-card {
+      background: var(--surface); padding: 1rem; border-radius: var(--r); box-shadow: var(--shadow);
+      display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s ease; min-height: 180px;
+      cursor: pointer;
+    }
+    .project-card:hover { transform: translateY(-3px); }
+    .project-card h3 { color: var(--accent); margin-bottom: 0.5rem; }
+    .project-card p { color: var(--muted); margin: 0.25rem 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .project-status { padding: 0.25rem 0.5rem; border-radius: 999px; font-size: 0.75rem; margin-top: 0.5rem; display: inline-block; }
+    .status-planning { background: color-mix(in oklab, #facc15 25%, var(--surface)); color: #000; }
+    .status-progress { background: color-mix(in oklab, #3b82f6 25%, var(--surface)); color: #000; }
+    .status-review { background: color-mix(in oklab, #eab308 25%, var(--surface)); color: #000; }
+    .status-done { background: color-mix(in oklab, #22c55e 25%, var(--surface)); color: #000; }
+    footer { background: var(--surface); padding: 1rem; text-align: center; color: var(--muted); margin-top: 2rem; border-top: 1px solid color-mix(in oklab, var(--muted) 35%, transparent); }
+    footer a { color: var(--accent); margin: 0 0.5rem; }
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: var(--surface); padding: 2rem; border-radius: var(--r); width: 90%; max-width: 500px; }
+    .close { float: right; cursor: pointer; font-size: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; color: var(--text); }
+    .form-control { width: 100%; padding: 0.5rem; border-radius: var(--r); border: 1px solid var(--muted); background: var(--elev); color: var(--text); }
+    textarea.form-control { min-height: 100px; }
+    select.form-control[multiple] { height: 120px; }
+    .mt-2 { margin-top: 1rem; }
+  </style>
+</head>
+
+<script>
+  // Apply saved theme (default = dark)
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+</script>
+
+<body>
+
+<aside class="sidebar">
+  <h1>ProMan</h1>
+  <a href="home.html">Dashboard</a>
+  <a href="projects.html">Projects</a>
+  <a href="teams.html">Teams</a>
+  <a href="calendar.html">Calendar</a>
+  <a href="settings.html">Settings</a>
+</aside>
+
+<div class="main">
+  <div class="main-header">
+    <h2>Projects</h2>
+    <button id="newProjectBtn" class="btn btn-primary">+ New Project</button>
+  </div>
+
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h2>Create / Edit Project</h2>
+      <form id="createProjectForm">
+        <div class="form-group">
+          <label for="projectName">Project Name</label>
+          <input type="text" id="projectName" class="form-control" placeholder="Project Name" required>
+        </div>
+        <div class="form-group">
+          <label for="projectDescription">Description</label>
+          <textarea id="projectDescription" class="form-control" placeholder="Description"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="projectDeadline">Deadline</label>
+          <input type="date" id="projectDeadline" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="projectStatus">Status</label>
+          <select id="projectStatus" class="form-control">
+            <option value="planning">Planning</option>
+            <option value="progress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="projectTeam">Team Members (comma separated emails/UIDs)</label>
+          <input type="text" id="projectTeam" class="form-control" placeholder="user1@example.com, user2@example.com">
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Save Project</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="projects-grid"></div>
+
+  <footer>
+    <p>© 2025 Planhubb. All rights reserved.</p>
+    <p><a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Contact</a></p>
+  </footer>
+</div>
+
+<script type="module">
+import { auth } from "./js/firebase/config.js";
+import { protectPage } from "./js/firebase/authGuard.js";
+import { 
+  createProject, updateProject, deleteProject, onProjectsChange 
+} from "./js/firebase/firestore.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore.js";
+
+protectPage();
+
+const db = getFirestore();
+const usersCol = collection(db, "users"); // assume you have a users collection
+
+const projectsGrid = document.querySelector(".projects-grid");
+const newProjectBtn = document.getElementById("newProjectBtn");
+const projectModal = document.getElementById("projectModal");
+const closeModal = document.getElementById("closeModal");
+const createProjectForm = document.getElementById("createProjectForm");
+
+// Open / close modal
+newProjectBtn.addEventListener("click", () => openProjectModal());
+closeModal.addEventListener("click", () => closeProjectModal());
+window.addEventListener("click", e => { if (e.target === projectModal) closeProjectModal(); });
+
+function openProjectModal(project = null) {
+  projectModal.style.display = "flex";
+  if (project) {
+    document.getElementById("projectName").value = project.name;
+    document.getElementById("projectDescription").value = project.description || "";
+    document.getElementById("projectDeadline").value = project.deadline || "";
+    document.getElementById("projectStatus").value = project.status || "planning";
+    document.getElementById("projectTeam").value = project.teamEmails ? project.teamEmails.join(", ") : "";
+    createProjectForm.dataset.editId = project.id;
+  } else {
+    createProjectForm.reset();
+    delete createProjectForm.dataset.editId;
+  }
+}
+
+function closeProjectModal() {
+  projectModal.style.display = "none";
+}
+
+// Helper: convert emails → UIDs
+async function emailsToUIDs(emails) {
+  const uids = [];
+  for (let email of emails) {
+    const q = query(usersCol, where("email", "==", email.trim()));
+    const snap = await getDocs(q);
+    if (!snap.empty) uids.push(snap.docs[0].id);
+  }
+  return uids;
+}
+
+// Render a project card
+function renderProject(project) {
+  const card = document.createElement("div");
+  card.className = "project-card";
+  card.innerHTML = `
+    <h3>${project.name}</h3>
+    <p>Team: ${project.teamEmails?.join(", ") || "N/A"}</p>
+    <p>Deadline: ${project.deadline || "N/A"}</p>
+    <span class="project-status status-${project.status}">${project.status}</span>
+    <div class="project-actions">
+      <button class="btn btn-outline edit-btn">Edit</button>
+      <button class="btn btn-contrast delete-btn">Delete</button>
+    </div>
+  `;
+
+  // Edit
+  card.querySelector(".edit-btn").addEventListener("click", e => {
+    e.stopPropagation();
+    openProjectModal(project);
+  });
+
+  // Delete
+  card.querySelector(".delete-btn").addEventListener("click", async e => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this project?")) {
+      await deleteProject(project.id);
+    }
+  });
+
+  // Open kanban
+  card.addEventListener("click", () => {
+    localStorage.setItem("selectedProjectId", project.id);
+    window.location.href = "kanban.html";
+  });
+
+  projectsGrid.appendChild(card);
+}
+
+// Handle form submit (create / update)
+createProjectForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (!auth.currentUser) return alert("You must be logged in!");
+
+  const name = document.getElementById("projectName").value.trim();
+  const description = document.getElementById("projectDescription").value.trim();
+  const deadline = document.getElementById("projectDeadline").value;
+  const status = document.getElementById("projectStatus").value;
+  const teamEmails = document.getElementById("projectTeam").value.split(",").map(u => u.trim()).filter(Boolean);
+
+  const teamUIDs = await emailsToUIDs(teamEmails); // convert emails → UIDs
+  if (!teamUIDs.includes(auth.currentUser.uid)) teamUIDs.push(auth.currentUser.uid); // ensure creator is in team
+
+  const editId = createProjectForm.dataset.editId;
+  if (editId) {
+    await updateProject(editId, { name, description, deadline, status, team: teamUIDs, teamEmails });
+  } else {
+    await createProject({ name, description, deadline, status, team: teamUIDs, teamEmails });
+  }
+
+  closeProjectModal();
+});
+
+// Real-time projects
+auth.onAuthStateChanged(user => {
+  if (user) {
+    onProjectsChange(projects => {
+      projectsGrid.innerHTML = "";
+      projects.forEach(renderProject);
+    });
+  }
+});
+
+</script>
+</body>
+</html>
