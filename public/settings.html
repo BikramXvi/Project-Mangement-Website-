@@ -149,6 +149,22 @@
   document.getElementById("logout-btn").addEventListener("click", () => {
     logout(); // redirect happens automatically
   });
+  // Get the select element
+  const themeSelect = document.getElementById("theme");
+
+  // Load saved theme from localStorage
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+  themeSelect.value = savedTheme;
+
+  // Listen for changes
+  themeSelect.addEventListener("change", function() {
+    const selectedTheme = this.value;
+    // Set the HTML data-theme attribute
+    document.documentElement.setAttribute("data-theme", selectedTheme);
+    // Save preference
+    localStorage.setItem("theme", selectedTheme);
+  });
 </script>
 </body>
 </html>
